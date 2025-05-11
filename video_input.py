@@ -27,3 +27,7 @@ with mp_face_detection.FaceDetection(model_selection=0, min_detection_confidence
 
 cap.release()
 cv2.destroyAllWindows()
+
+
+# Sblm selsai backlog pastiin dulu dari kalian sanggup ga slesain 
+# bersedia comitment brp jam per hari , berarti per sprint bisa brp jam 

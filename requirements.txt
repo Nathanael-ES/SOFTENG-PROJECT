@@ -1,0 +1,7 @@
+tensorflow
+opencv-python
+matplotlib
+numpy
+dlib
+cv2
+mediapipe
