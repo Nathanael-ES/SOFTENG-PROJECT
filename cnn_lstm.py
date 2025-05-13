@@ -1,28 +1,50 @@
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, LSTM, Dense, Flatten, Dropout
+from keras.layers import Input,TimeDistributed, Conv2D, Dense, MaxPooling2D, Flatten, LSTM, Dropout, BatchNormalization
+from keras import Model
 
-def create_model(input_shape):
-    model = Sequential()
-    
-    # CNN layers for feature extraction
-    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D((2, 2)))
-    
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dropout(0.5))  # Regularization
-    model.add(Dense(1, activation='sigmoid'))  # For binary classification (drunk or not)
+inputShape=(10,224,224,1)
+input=Input(inputShape)
 
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    
-    return model
+x=TimeDistributed(Conv2D(64, (3, 3), strides=(1,1),padding='same',activation='elu'),input_shape=(10, 224, 224, 1)) (input)
+x=TimeDistributed(Conv2D(64, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(MaxPooling2D(2,2))(x)
+x=Dropout(0.3)(x)
 
-# Example: Model input shape (change this based on your actual data)
-input_shape = (224, 224, 3)  # Example for image data, modify accordingly
-model = create_model(input_shape)
+x=TimeDistributed(Conv2D(128, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(128, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(MaxPooling2D(2,2))(x)
+x=TimeDistributed(BatchNormalization())(x)
 
-# Summary of the model
-model.summary()
+x=TimeDistributed(Conv2D(256, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(256, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(256, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(256, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(MaxPooling2D(2,2))(x)
+x=Dropout(0.3)(x)
+
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+
+x=TimeDistributed(MaxPooling2D(2,2))(x)
+x=TimeDistributed(BatchNormalization())(x)
+
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(Conv2D(512, (3, 3), strides=(1,1),activation='elu'))(x)
+x=TimeDistributed(MaxPooling2D(2,2))(x)
+x=TimeDistributed(BatchNormalization())(x)
+
+
+x=TimeDistributed(Flatten())(x)
+x=Dropout(0.3)(x)
+
+x=LSTM(512,return_sequences=False,dropout=0.2)(x) # used 32 units
+
+x=Dense(128,activation='elu')(x)
+x=Dense(64,activation='elu')(x)
+x=Dropout(0.3)(x)
+x=Dense(4, activation='softmax')(x)
+
+model=Model(inputs=input,outputs=x,name='Pretict')
